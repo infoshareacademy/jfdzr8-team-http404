@@ -1,38 +1,57 @@
 import { useEffect, useState } from "react";
 import { db } from "../../../Api/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  startAt,
+  limit,
+  orderBy,
+  getCountFromServer,
+} from "firebase/firestore";
 import BookCard from "./BookCard/BookCard";
 import styles from "./ListBooks.module.css";
-import ReactPaginate from "react-paginate";
+import Pagination from "../../../components/Pagination/Pagination";
 
 const ListBooks = () => {
   const [books, setBooks] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const limit = 3;
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 6;
 
   const getBooks = () => {
-    const startIndex = (currentPage - 1) * limit;
+    const startIndex = currentPage * pageSize;
     const booksCollection = collection(db, "books");
-    getDocs(booksCollection).then((querySnapshot) => {
-      const books = querySnapshot.docs
-        .map((doc) => ({
+
+    getCountFromServer(booksCollection).then((querySnapshot) => {
+      const booksCount = querySnapshot.data().count;
+      console.log(`Books count: ${booksCount}`);
+      setTotalPages(Math.ceil(booksCount / pageSize));
+
+      const queryBookPage = query(
+        booksCollection,
+        orderBy("id"),
+        startAt(startIndex + 1),
+        limit(pageSize)
+      );
+      getDocs(queryBookPage).then((querySnapshot) => {
+        const booksOnPage = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }))
-        .slice(startIndex, startIndex + limit);
-      console.log(books);
-      setBooks(books);
-      setTotalPages(Math.ceil(querySnapshot.size / limit));
+        }));
+        console.log(booksOnPage);
+        setBooks(booksOnPage);
+      });
     });
   };
 
   useEffect(() => {
     getBooks();
-  }, [currentPage]);
+  });
 
   const handlePageChange = (data) => {
-    setCurrentPage(data.selected + 1);
+    console.log(`page selected ${data.selected}`);
+    setCurrentPage(data.selected);
   };
 
   return (
@@ -44,20 +63,7 @@ const ListBooks = () => {
         })}
       </div>
 
-      <div id="react-paginate" className={styles.reactPaginate}>
-        <ReactPaginate
-          previousLabel={"<"}
-          nextLabel={">"}
-          breakClassName={"break-me"}
-          pageCount={totalPages}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={10}
-          onPageChange={handlePageChange}
-          containerClassName={"pagination"}
-          subContainerClassName={"pages pagination"}
-          activeClassName={"active"}
-        />
-      </div>
+      <Pagination pageCount={totalPages} onPageChange={handlePageChange} />
     </div>
   );
 };
