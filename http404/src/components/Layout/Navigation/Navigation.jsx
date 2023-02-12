@@ -8,9 +8,10 @@ import avatar from "./atena_avatar1.png";
 const signOutReload = () => {
   signOut(auth);
   window.location.reload(true);
+  window.location = "http:/";
 };
 
-const Navigation = ({userData}) => {
+const Navigation = ({ userData }) => {
   return (
     <nav className={styles.navigation}>
       <Link to="/">

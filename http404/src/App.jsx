@@ -14,15 +14,13 @@ import { Profile } from "./view/Auth/Profile/Profile";
 import { AddBooks } from "./view/Admin/AddBooks";
 import { ToastContainer } from "react-toastify";
 
-
 function App() {
-
-  const {userData} = useContext(userDataContext);
+  const { userData } = useContext(userDataContext);
 
   return (
     <div className="App">
       <BrowserRouter>
-        <Navigation userData={userData}/>
+        <Navigation userData={userData} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="auth/register" element={<Register />} />
@@ -31,7 +29,10 @@ function App() {
           <Route path="/searching" element={<SearchingSite />} />
           <Route path="/:bookTitle/:bookId" element={<BookDetails />} />
           <Route path="auth/admin" element={<AddBooks />} />
-          <Route path="/auth/login/przypomnijhaslo" element={<ForgotPassword/>} />
+          <Route
+            path="/auth/login/przypomnijhaslo"
+            element={<ForgotPassword />}
+          />
         </Routes>
         <ToastContainer
           position="top-right"

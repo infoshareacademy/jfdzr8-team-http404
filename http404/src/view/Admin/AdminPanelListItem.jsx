@@ -50,7 +50,7 @@ export const AdminPanelListItem = ({book, getData}) => {
         updateDoc(docRef, updates, book.id)
           .then(() => {
             handleClose()
-            toast.success("Title has been updated successfully.");
+            toast.success("Dane zostały zmienione poprawnie");
             getData()
           })
           .catch((error) => {
